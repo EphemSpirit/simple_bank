@@ -26,6 +26,8 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+        ports:
+          - 5433:5432
 
     steps:
 
@@ -40,7 +42,7 @@ jobs:
     - name: Install golang migrate
       run: |
         curl -L https://github.com/golang-migrate/migrate/releases/download/4.12.2/migrate.linux-amd64.tar.gz | tar xvz
-        sudo mv migrate /usr/bin/
+        sudo mv migrate.linux-amd64 /usr/bin/migrate
         which migrate
 
     - name: Run migrations
