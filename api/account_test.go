@@ -18,38 +18,63 @@ import (
 )
 
 func TestCreateAccountAPI(t *testing.T) {
-	args := db.CreateAccountParams{
-		Owner: util.RandomOwner(),
-		Balance: 0,
-		Currency: util.RandomCurrency(),
-	}
+	// args := db.CreateAccountParams{
+	// 	Owner: util.RandomOwner(),
+	// 	Balance: 0,
+	// 	Currency: util.RandomCurrency(),
+	// }
 
 	cases := []struct{
 		name string
 		buildStubs func(store *mockdb.MockStore)
 		checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
+		body db.CreateAccountParams
 	}{
 		{
 			name: "OK",
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
-					CreateAccount(gomock.Any(), gomock.Eq(args)).
+					CreateAccount(gomock.Any(), gomock.Any()).
 					Times(1)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusOK, recorder.Code)
 			},
+			body: db.CreateAccountParams{
+				Owner: util.RandomOwner(),
+				Balance: 0,
+				Currency: util.RandomCurrency(),
+			},
+		},
+		{
+			name: "BadRequest",
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					CreateAccount(gomock.Any(), gomock.Any()).
+					Times(0)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+			body: db.CreateAccountParams{
+				Owner: "",
+				Balance: 0,
+				Currency: "SFA",
+			},
 		},
 	}
 
-	body, err := json.Marshal(args)
-	if err != nil {
-		return
-	}
 
 	for i := range cases {
 		tc := cases[i]
+
+		
+
 		t.Run(tc.name, func(t *testing.T) {
+			body, err := json.Marshal(tc.body)
+			if err != nil {
+				return
+			}
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
