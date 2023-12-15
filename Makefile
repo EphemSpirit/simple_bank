@@ -25,4 +25,7 @@ test:
 server:
 	go run main.go
 
-.PHONY: postgres pgconsole createdb dropdb migrateup migratedown server
+mock:
+	mockgen -package mockdb -destination db/mock/store.go github.com/EphemSpirit/simple_bank/db/sqlc Store
+
+.PHONY: postgres pgconsole createdb dropdb migrateup migratedown server mock

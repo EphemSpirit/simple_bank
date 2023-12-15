@@ -53,7 +53,7 @@ func (s *Server) GetAccount(ctx *gin.Context) {
 			ctx.JSON(http.StatusNotFound, errResponse(err))
 			return
 		}
-		ctx.JSON(http.StatusBadRequest, errResponse(err))
+		ctx.JSON(http.StatusInternalServerError, errResponse(err))
 		return
 	 }
 
