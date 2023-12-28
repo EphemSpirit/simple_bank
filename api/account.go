@@ -2,7 +2,6 @@ package api
 
 import (
 	"database/sql"
-	"fmt"
 	"net/http"
 
 	db "github.com/EphemSpirit/simple_bank/db/sqlc"
@@ -17,7 +16,6 @@ type createAccountRequest struct {
 func (s *Server) CreateAccount(ctx *gin.Context) {
 	var req createAccountRequest
 
-	fmt.Println("HEY THERE")
 	if err := ctx.ShouldBindJSON(&req); err!= nil {
 		ctx.JSON(http.StatusBadRequest, errResponse(err))
 		return

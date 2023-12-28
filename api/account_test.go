@@ -17,13 +17,10 @@ import (
 	"go.uber.org/mock/gomock"
 )
 
-func TestCreateAccountAPI(t *testing.T) {
-	// args := db.CreateAccountParams{
-	// 	Owner: util.RandomOwner(),
-	// 	Balance: 0,
-	// 	Currency: util.RandomCurrency(),
-	// }
+// TODO: Finish writing tests for ListAccountRequest
+// TODO: Figure out why TestCreateAccountAPI fails intermittently when running package tests
 
+func TestCreateAccountAPI(t *testing.T) {
 	cases := []struct{
 		name string
 		buildStubs func(store *mockdb.MockStore)
@@ -60,6 +57,23 @@ func TestCreateAccountAPI(t *testing.T) {
 				Owner: "",
 				Balance: 0,
 				Currency: "SFA",
+			},
+		},
+		{
+			name: "InternalServerError",
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					CreateAccount(gomock.Any(), gomock.Any()).
+					Times(1).
+					Return(db.Account{}, sql.ErrConnDone)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusInternalServerError, recorder.Code)
+			},
+			body: db.CreateAccountParams{
+				Owner: util.RandomOwner(),
+				Balance: 0,
+				Currency: util.RandomCurrency(),
 			},
 		},
 	}
